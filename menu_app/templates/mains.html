@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Appetizers</title>
+  </head>
+  <body>
+    <main>
+      <h1>Main Courses</h1>
+      <ul>
+        {% for obj in mains %}
+        <li>
+          {{ obj.name }} {{obj.price}}
+          <form action="{% url 'mains-delete' obj.id %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Delete" />
+          </form>
+          <form action="{% url 'main-edit-form' obj.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" value="Edit">Edit</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      <div>
+        <a href="/backoffice/main_create_form">Create new main course</a>
+      </div>
+    </main>
+  </body>
+</html>

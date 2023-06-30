@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <main style="text-align: center">
+      <h1>Menu</h1>
+      <h2>Appetizers</h2>
+      <ul>
+        <!-- {{ appetizers.name }} -->
+      </ul>
+      <ul style="list-style: none; width: 50%; margin: 0 auto; padding: 0">
+        {% for item in appetizers %}
+        <a
+          style="text-decoration: none"
+          href="http://127.0.0.1:8000/appetizer_item/{{ item.id }}"
+        >
+          <li
+            style="width: 100%; display: flex; justify-content: space-between"
+          >
+            <p>{{ item.name }}</p>
+            <p>{{ item.price }}</p>
+          </li>
+        </a>
+        {% endfor %}
+      </ul>
+      <h2>Main Courses</h2>
+      <ul style="list-style: none; width: 50%; margin: 0 auto; padding: 0">
+        {% for item in mains %}
+        <a
+          style="text-decoration: none"
+          href="http://127.0.0.1:8000/main_item/{{ item.id }}"
+        >
+          <li
+            style="width: 100%; display: flex; justify-content: space-between"
+          >
+            <p>{{ item.name }}</p>
+            <p>{{ item.price }}</p>
+          </li>
+        </a>
+        {% endfor %}
+      </ul>
+      <h2>Desserts</h2>
+      <ul style="list-style: none; width: 50%; margin: 0 auto; padding: 0">
+        {% for item in desserts %}
+        <a
+          style="text-decoration: none"
+          href="http://127.0.0.1:8000/dessert_item/{{ item.id }}"
+        >
+          <li
+            style="width: 100%; display: flex; justify-content: space-between"
+          >
+            <p>{{ item.name }}</p>
+            <p>{{ item.price }}</p>
+          </li>
+        </a>
+        {% endfor %}
+      </ul>
+      <a href="/home">~ Back to Home</a>
+    </main>
+  </body>
+</html>
