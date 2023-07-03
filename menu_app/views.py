@@ -236,3 +236,42 @@ class AppetizerDetailedView(APIView):
         appetizer = Appetizer.objects.filter(id=id).delete()
         return Response(status=status.HTTP_200_OK)
 
+class MainCourseAPIView(APIView):
+    def get(self, request):
+        mains = MainCourse.objects.all()
+        # Deserialize the data
+        serializer = MainCourseSerializer(mains, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer.data)
+
+    def post(self, request):
+        # Create a new product in memory
+        serializer = MainCourseSerializer(data=request.data)
+        if serializer.is_valid():
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class MainCourseDetailedView(APIView):
+    def get(self, request, id):
+        main = MainCourse.objects.filter(id=id)
+        # Deserialize the data
+        serializer_class = MainCourseSerializer(main, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer_class.data)
+        
+    def patch(self, request, id):
+        # Create a new product in memory
+        main = MainCourse.objects.get(id=id)
+        serializer = AppetizerSerializer(main, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        main = MainCourse.objects.filter(id=id).delete()
+        return Response(status=status.HTTP_200_OK)
