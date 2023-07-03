@@ -265,7 +265,7 @@ class MainCourseDetailedView(APIView):
     def patch(self, request, id):
         # Create a new product in memory
         main = MainCourse.objects.get(id=id)
-        serializer = AppetizerSerializer(main, data=request.data)
+        serializer = MainCourseSerializer(main, data=request.data)
         if serializer.is_valid(raise_exception=True):
             # Commit the new product to the database
             serializer.save()
@@ -274,4 +274,45 @@ class MainCourseDetailedView(APIView):
 
     def delete(self, request, id):
         main = MainCourse.objects.filter(id=id).delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class DessertAPIView(APIView):
+    def get(self, request):
+        desserts = Dessert.objects.all()
+        # Deserialize the data
+        serializer = DessertSerializer(desserts, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer.data)
+
+    def post(self, request):
+        # Create a new product in memory
+        serializer = DessertSerializer(data=request.data)
+        if serializer.is_valid():
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class DessertDetailedView(APIView):
+    def get(self, request, id):
+        dessert = Dessert.objects.filter(id=id)
+        # Deserialize the data
+        serializer_class = DessertSerializer(dessert, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer_class.data)
+        
+    def patch(self, request, id):
+        # Create a new product in memory
+        dessert = Dessert.objects.get(id=id)
+        serializer = DessertSerializer(dessert, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        dessert = Dessert.objects.filter(id=id).delete()
         return Response(status=status.HTTP_200_OK)
