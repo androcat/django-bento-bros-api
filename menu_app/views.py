@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from menu_app.models import Appetizer, MainCourse, Dessert
 from django import forms
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseRedirect
-
-# appetizers = []
-# mains = []
-# desserts = []
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import *
 
 menu_list = [
       {
@@ -194,144 +195,44 @@ def desserts_index(request):
     desserts = Dessert.objects.all()
     return render(request, 'desserts.html', {'desserts': desserts})
 
-def appetizers_delete(request, id):
-    # dictionary for initial data with
-    # field names as keys
+
+class AppetizerAPIView(APIView):
+    def get(self, request):
+        appetizers = Appetizer.objects.all()
+        # Deserialize the data
+        serializer = AppetizerSerializer(appetizers, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer.data)
+
+    def post(self, request):
+        # Create a new product in memory
+        serializer = AppetizerSerializer(data=request.data)
+        if serializer.is_valid():
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    appetizers = Appetizer.objects.all()
-    # fetch the object related to passed id
-    obj = get_object_or_404(Appetizer, id = id)
- 
-    if request.method =="POST":
-        # delete object
-        obj.delete()
-        # after deleting redirect to
-        # home page
-        return render(request, 'appetizers.html', {'appetizers': appetizers})
-    else:
-        return HttpResponseNotAllowed(['POST'])
-
-def mains_delete(request, id):
-    # dictionary for initial data with
-    # field names as keys
     
-    mains = MainCourse.objects.all()
-    # fetch the object related to passed id
-    obj = get_object_or_404(MainCourse, id = id)
- 
-    if request.method =="POST":
-        # delete object
-        obj.delete()
-        # after deleting redirect to
-        # home page
-        return render(request, 'mains.html', {'mains': mains})
-    else:
-        return HttpResponseNotAllowed(['POST'])
+class AppetizerDetailedView(APIView):
+    def get(self, request, id):
+        appetizer = Appetizer.objects.filter(id=id)
+        # Deserialize the data
+        serializer_class = AppetizerSerializer(appetizer, many=True)
+        # Return the deserialized data as the response
+        return Response(serializer_class.data)
+        
+    def patch(self, request, id):
+        # Create a new product in memory
+        appetizer = Appetizer.objects.get(id=id)
+        serializer = AppetizerSerializer(appetizer, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            # Commit the new product to the database
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def desserts_delete(request, id):
-    # dictionary for initial data with
-    # field names as keys
-    
-    desserts = Dessert.objects.all()
-    # fetch the object related to passed id
-    obj = get_object_or_404(Dessert, id = id)
- 
-    if request.method =="POST":
-        # delete object
-        obj.delete()
-        # after deleting redirect to
-        # home page
-        return render(request, 'desserts.html', {'desserts': mains})
-    else:
-        return HttpResponseNotAllowed(['POST'])
+    def delete(self, request, id):
+        appetizer = Appetizer.objects.filter(id=id).delete()
+        return Response(status=status.HTTP_200_OK)
 
-class AppetizerForm(forms.ModelForm):
-    class Meta:
-        model = Appetizer
-        fields = ['name', 'japanese_name', 'price', 'description']
-
-def appetizer_update(request, id):
-    obj = get_object_or_404(Appetizer, id=id)
-    
-    if request.method == 'POST':
-        form = AppetizerForm(request.POST, instance=obj)
-        if form.is_valid():
-            form.save()
-    else:
-        form = AppetizerForm(instance=obj)
-    context = {
-      'form': form,
-      'obj': obj
-      # 'appetizers': Appetizer.objects.all()
-    }
-    return render(request, 'appetizer_form.html', context)
-
-class MainCourseForm(forms.ModelForm):
-    class Meta:
-        model = MainCourse
-        fields = ['name', 'japanese_name', 'price', 'description']
-
-def main_update(request, id):
-    obj = get_object_or_404(MainCourse, id=id)
-    
-    if request.method == 'POST':
-        form = MainCourseForm(request.POST, instance=obj)
-        if form.is_valid():
-            form.save()
-    else:
-        form = MainCourseForm(instance=obj)
-    context = {
-      'form': form,
-      'obj': obj
-    }
-    return render(request, 'main_form.html', context)
-
-class DessertForm(forms.ModelForm):
-    class Meta:
-        model = Dessert
-        fields = ['name', 'japanese_name', 'price', 'description']
-
-def dessert_update(request, id):
-    obj = get_object_or_404(Dessert, id=id)
-    
-    if request.method == 'POST':
-        form = DessertForm(request.POST, instance=obj)
-        if form.is_valid():
-            form.save()
-    else:
-        form = DessertForm(instance=obj)
-    context = {
-      'form': form,
-      'obj': obj
-    }
-    return render(request, 'dessert_form.html', context)
-
-def appetizer_create(request):    
-    if request.method == 'POST':
-        form = AppetizerForm(request.POST)
-        if form.is_valid():
-            form.save()
-    else:
-        form = AppetizerForm()
-
-    return render(request, 'appetizer_create.html', {'form': form})
-
-def main_create(request):    
-    if request.method == 'POST':
-        form = MainCourseForm(request.POST)
-        if form.is_valid():
-            form.save()
-    else:
-        form = MainCourseForm()
-
-    return render(request, 'main_create.html', {'form': form})
-
-def dessert_create(request):    
-    if request.method == 'POST':
-        form = DessertForm(request.POST)
-        if form.is_valid():
-            form.save()
-    else:
-        form = DessertForm()
-
-    return render(request, 'dessert_create.html', {'form': form})
